@@ -482,13 +482,21 @@
     }
   }
 
-  // ================= B.S. & A.D. CALENDAR ENGINE =================
+  // ================= B.S. & A.D. CALENDAR ENGINE (FORCED TO NEPAL TIME) =================
   const nepaliDays = ["आइतबार", "सोमबार", "मंगलबार", "बुधबार", "बिहीबार", "शुक्रबार", "शनिबार"];
   const nepaliMonths = ["वैशाख", "जेठ", "असार", "साउन", "भदौ", "असोज", "कार्तिक", "मंसिर", "पुस", "माघ", "फागुन", "चैत"];
   const engMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   function toNepaliDigits(s) {
     return String(s).replace(/[0-9]/g, d => ['०','१','२','३','४','५','६','७','८','९'][d]);
+  }
+
+  // Helper to get current Date object strictly adjusted to Nepal Time (GMT+5:45)
+  function getNepalTimeDate() {
+    const now = new Date();
+    // Convert local time to UTC, then add Nepal offset (+5 hours 45 minutes in milliseconds)
+    const nepalTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (5 * 60 + 45) * 60000);
+    return nepalTime;
   }
 
   function getAccurateBSDate(dateObj) {
@@ -518,7 +526,7 @@
 
   function startNepaliClock() {
     function updateClock() {
-      const now = new Date();
+      const now = getNepalTimeDate();
       const bs = getAccurateBSDate(now);
       const bsText = `${toNepaliDigits(bs.year)} ${bs.month} ${toNepaliDigits(bs.day)}, ${nepaliDays[now.getDay()]}`;
       const adText = `${now.getDate()} ${engMonths[now.getMonth()]} ${now.getFullYear()}`;
@@ -552,7 +560,7 @@
   function renderCalendar() {
     const grid = document.getElementById("cal-days-grid");
     grid.innerHTML = "";
-    const now = new Date();
+    const now = getNepalTimeDate();
 
     if (currentCalMode === "BS") {
       const bs = getAccurateBSDate(now);
@@ -607,7 +615,7 @@
   function initScheduleTable() {
     const tbody = document.getElementById("sched-tbody");
     tbody.innerHTML = "";
-    const todayIndex = new Date().getDay();
+    const todayIndex = getNepalTimeDate().getDay();
     for (let i = 0; i < 7; i++) {
       const isToday = (i === todayIndex);
       tbody.innerHTML += `<tr ${isToday ? "class='today-row'" : ""}>
